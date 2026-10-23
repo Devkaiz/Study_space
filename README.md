@@ -1,41 +1,93 @@
-# WeatherGPT — SIH 2026 Prototype
+# StudySpace
 
-WeatherGPT converts verified weather facts into understandable, location-aware disaster advisories. It is an end-to-end React + FastAPI prototype designed to run fully in **DEMO MODE** without any paid API.
+StudySpace is a full-stack collaborative study material and productivity platform for B.Tech Software Engineering demonstrations. It is intentionally built with approachable technologies: vanilla HTML/CSS/JavaScript, Express, and SQLite.
 
-## Project structure
+## Features
+
+- JWT + bcrypt registration, login, demo login, profile editing, and password changes
+- Database-backed dashboard with live task, session, group, material, and notification data
+- Material upload (10 MB limit; PDF/DOC/DOCX/PPT/PPTX/TXT), external links, search/filter, view/download/delete
+- Study groups, membership, member lists, and database-backed discussions
+- Tasks with deadlines, priority, complete/undo, editing, deleting, calendar display, and overdue status
+- Pomodoro timer plus an explicit **Demo Complete Session** action that records a real 25-minute session
+- Progress analytics, weekly activity, read/unread notifications, responsive navigation
+
+## Stack and architecture
+
+`Vanilla JS frontend → fetch REST API → Node.js + Express → SQLite`
+
+All dashboard/progress data is calculated from SQLite; the frontend does not hardcode project statistics.
+
+## Run locally
+
+1. Install [Node.js](https://nodejs.org/) 18+.
+2. In this project folder, run `npm install`.
+3. Run `npm start`.
+4. Open `http://localhost:3000`.
+
+The database (`studyspace.db`) and sample data are initialized automatically on first start. Uploaded material files are stored in `uploads/`.
+
+## Demo account
+
+- Email: `demo@studyspace.com`
+- Password: `Demo@123`
+
+Click **Continue as Demo User** on the opening login page.
+
+## API endpoints
+
+| Area | Endpoints |
+|---|---|
+| Auth | `POST /api/auth/register`, `POST /api/auth/login`, `GET/PATCH /api/me`, `POST /api/auth/change-password` |
+| Dashboard | `GET /api/dashboard` |
+| Materials | `GET/POST /api/materials`, `DELETE /api/materials/:id` |
+| Groups | `GET/POST /api/groups`, `GET /api/groups/:id`, `POST /api/groups/:id/join`, `/leave`, `GET/POST /api/groups/:id/comments` |
+| Tasks | `GET/POST /api/tasks`, `PATCH/DELETE /api/tasks/:id` |
+| Calendar | `GET /api/calendar` |
+| Focus sessions | `GET/POST /api/sessions` |
+| Progress | `GET /api/progress` |
+| Notifications | `GET /api/notifications`, `PATCH /api/notifications/:id/read`, `PATCH /api/notifications/read-all` |
+
+## Database schema
+
+SQLite tables: `Users`, `StudyMaterials`, `StudyGroups`, `GroupMembers`, `GroupComments`, `Tasks`, `StudySessions`, and `Notifications`. Foreign keys are enabled and relationships are enforced. Password hashes are never returned from APIs.
+
+## Project layout
+
 ```
-backend/             FastAPI API, SQLite development fallback, grounded demo services
-  app/main.py         Auth, weather, chat, geo targeting, alerts, IVR simulation
-  .env.example        Configuration template
-frontend/             Vite + React + TypeScript responsive web app
+StudySpace/
+├── server.js          # Express API and authorization
+├── database.js        # SQLite schema + automatic realistic demo seed
+├── package.json
+├── studyspace.db      # created on first run
+├── uploads/
+└── public/
+    ├── index.html     # login/register and responsive SPA shell
+    ├── css/style.css
+    └── js/app.js
 ```
 
-## Run
-1. Backend: `cd backend; python -m venv .venv; .\.venv\Scripts\Activate.ps1; pip install -r requirements.txt; uvicorn app.main:app --reload --port 8000`
-2. Frontend: `cd frontend; npm install; npm run dev`
-3. Open `http://localhost:5173`.
+## Suggested demonstration
 
-## Demo credentials
-Mobile: `9999999999` · Password: `Demo@123`.
+1. Open the login page and choose the demo user.
+2. Dashboard: explain live statistics and quick actions.
+3. Materials: search `DBMS`, open a resource, then upload a supported file or add a URL.
+4. Groups: open Big Data Squad and post a discussion message.
+5. Tasks: create **Complete Software Engineering Report** with deadline/priority/subject, then open Calendar.
+6. Pomodoro: start normally or use **Demo Complete Session**; it writes to SQLite and makes a notification.
+7. Progress and Notifications: show updated session metrics and mark notification read.
+8. Profile and logout.
 
-## DEMO MODE works without credentials
-- Weather dashboard and source-labelled realistic demo data
-- Deterministic grounded chat with shown weather facts
-- Registration/login using PBKDF2 password hashes and local SQLite fallback
-- Map polygon and in-region recipient selection
-- Emergency simulation, alerts, Malayalam/English advisory, browser speech, IVR/SMS simulation
-- Actual measured backend processing timings
+## Testing
 
-## Optional external integrations
-`WEATHER_API_KEY` for a weather provider, `OPENAI_API_KEY` for a grounded LLM, `BHASHINI_API_KEY` for regional TTS/translation, and `TELEPHONY_API_KEY` for IVR. None are exposed to the frontend. The current prototype deliberately labels all fallback activity as demo mode.
+Start the server, use the demo flow above, and use browser DevTools Network/Console to observe API calls. The backend validates authorization, task/material ownership, group membership, malformed values, duplicate emails, and upload size/type.
 
-## SIH demo flow
-1. Sign in with the demo account; show Punalur dashboard.
-2. Ask “Will it rain tonight?”; show the response and **Weather facts used**.
-3. Open Map to show the demo affected polygon and users.
-4. Open Admin Demo, choose Malayalam, and click **Simulate Heavy Rainfall**.
-5. Show the alert, live log, selected opted-in recipients, voice text / browser playback, IVR DEMO status, and measured timing.
-6. Explain that an actual IVR integration delivers normal cellular calls, so the recipient phone does not require an app or mobile internet.
+## Future enhancements
 
-### Architecture notes
-Production PostGIS should replace the SQLite bounding-box fallback for robust polygon queries. `GET /atmospheric/demo` documents the xarray spatial/temporal filtering pipeline; add actual NetCDF input and xarray processing when meteorological data is available. Prototype thresholds are demonstrative, not official meteorological thresholds.
+- AI study assistant and AI-generated quizzes
+- Automatic material summarization
+- Cloud storage
+- Real-time group chat
+- Mobile application
+- Advanced analytics
+- Calendar synchronization
